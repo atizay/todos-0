@@ -25,6 +25,7 @@ export default function TodoList(props) {
                 <button
                   className="button is-danger"
                   title="Удалить"
+                  onClick={(e) => props.delete(item.key)}
                   disabled={item.done}>
                   &#9746;
                 </button>
