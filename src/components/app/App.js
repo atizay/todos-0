@@ -1,4 +1,5 @@
 import { Component } from "react";
+import TodoList from "../todo-list/TodoList";
 
 const date1 = new Date(2022, 10,  31,  14, 5);
 const date2 = new Date(2022, 10,  31,  16, 8);
@@ -39,10 +40,9 @@ export default class App extends Component {
           </div>
         </nav>
         <main className="context px-6 mt-6">
-          <h1>Todos</h1>
+          <TodoList list={this.data} />
         </main>
       </div>
     )
   }
-
 }
