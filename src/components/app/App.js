@@ -9,34 +9,13 @@ import firebaseApp from "../../firebase";
 import Register from "../register/Register";
 import Login from "../login/Login";
 import Logout from "../logout/Logout";
-
-const date1 = new Date(2022, 10,  31,  14, 5);
-const date2 = new Date(2022, 10,  31,  16, 8);
-
-const initialData = [
-  {
-    title: 'Изучить React',
-    desc: 'Да поскорее!',
-    image: '',
-    done: true,
-    createdAt: date1.toLocaleString(),
-    key: date1.getTime()
-  },
-  {
-    title: 'Написать первое React приложение',
-    desc: 'Список запланированных дел',
-    image: '',
-    done: false,
-    createdAt: date2.toLocaleString(),
-    key: date2.getTime()
-  }
-];
+import { del, getList, setDone } from "../../api";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: initialData,
+      data: [],
       showMenu: false,
       currentUser: undefined
     };
@@ -48,7 +27,8 @@ export default class App extends Component {
     this.authStateChanged = this.authStateChanged.bind(this);
   }
 
-  setDone(key) {
+  async setDone(key) {
+    await setDone(this.state.currentUser, key);
     const deed = this.state.data.find(
       (current) => current.key === key
     );
@@ -58,7 +38,8 @@ export default class App extends Component {
     }
   }
 
-  delete(key) {
+  async delete(key) {
+    await del(this.state.currentUser, key);
     const newData = this.state.data.filter(
       (current) => current.key !== key
     );
@@ -76,12 +57,17 @@ export default class App extends Component {
   }
 
   getDeed(key) {
-    key = +key;
     return this.state.data.find((current) => current.key === key);
   }
 
-  authStateChanged(user) {
+  async authStateChanged(user) {
     this.setState((state) => ({ currentUser: user }));
+    if (user) {
+      const newData = await getList(user);
+      this.setState((state) => ({ data: newData }));
+    } else {
+      this.setState((state) => ({ data: [] }));
+    }
   }
 
   componentDidMount() {
@@ -141,7 +127,7 @@ export default class App extends Component {
             <Route
               path="/add"
               element={
-                <TodoAdd add={this.add} />
+                <TodoAdd add={this.add} currentUser={this.state.currentUser} />
               }
             />
             <Route
