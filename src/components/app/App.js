@@ -121,7 +121,7 @@ export default class App extends Component {
             <Route
               path="/"
               element={
-                <TodoList list={this.state.data} setDone={this.setDone} delete={this.delete} />
+                <TodoList list={this.state.data} setDone={this.setDone} delete={this.delete} currentUser={this.state.currentUser} />
               }
             />
             <Route
@@ -133,7 +133,7 @@ export default class App extends Component {
             <Route
               path="/:key"
               element={
-                <TodoDetail getDeed={this.getDeed} />
+                <TodoDetail getDeed={this.getDeed} currentUser={this.state.currentUser} />
               }
             />
             <Route
