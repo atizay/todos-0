@@ -3,6 +3,10 @@ import { HashRouter, Routes, Route, NavLink } from "react-router-dom";
 import TodoAdd from "../todo-add/TodoAdd";
 import TodoDetail from "../todo-detail/TodoDetail";
 import TodoList from "../todo-list/TodoList";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+import firebaseApp from "../../firebase";
+import Register from "../register/Register";
 
 const date1 = new Date(2022, 10,  31,  14, 5);
 const date2 = new Date(2022, 10,  31,  16, 8);
@@ -29,12 +33,17 @@ const initialData = [
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {data: initialData, showMenu: false};
+    this.state = {
+      data: initialData,
+      showMenu: false,
+      currentUser: undefined
+    };
     this.setDone = this.setDone.bind(this);
     this.delete = this.delete.bind(this);
     this.add = this.add.bind(this);
     this.getDeed = this.getDeed.bind(this);
     this.showMenu = this.showMenu.bind(this);
+    this.authStateChanged = this.authStateChanged.bind(this);
   }
 
   setDone(key) {
@@ -69,6 +78,14 @@ export default class App extends Component {
     return this.state.data.find((current) => current.key === key);
   }
 
+  authStateChanged(user) {
+    this.setState((state) => ({ currentUser: user }));
+  }
+
+  componentDidMount() {
+    onAuthStateChanged(getAuth(firebaseApp), this.authStateChanged);
+  }
+
   render() {
     return (
       <HashRouter>
@@ -78,7 +95,7 @@ export default class App extends Component {
               to="/"
               className={ ({isActive}) => 'navbar-item is-uppercase' + (isActive ? ' is-active' : '')}
             >
-              Todos
+              {this.state.currentUser ? this.state.currentUser.email : 'Todos'} 
             </NavLink>
             <a href="/" className={this.state.showMenu ? 'navbar-burger is-active' : 'navbar-burger'} onClick={this.showMenu}>
                 <span></span>
@@ -88,16 +105,17 @@ export default class App extends Component {
           </div>
           <div className={this.state.showMenu ? 'navbar-burger is-active' : 'navbar-menu'} onClick={this.showMenu}>
             <div className="navbar-start">
-              <NavLink
-                to="/add"
-                className={ ({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}
-              >
-                Создать дело
-              </NavLink>
-              
+              {this.state.currentUser && (
+                <NavLink to="/add" className={ ({isActive}) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                  Создать дело
+                </NavLink>
+              )}
+              {!this.state.currentUser && (
+                <NavLink to="/register" className={ ({ isActive }) => 'navbar-item' + (isActive ? ' is-active' : '') }>
+                  Зарегистрироваться
+                </NavLink>
+              )}
             </div>
-
-
           </div>
         </nav>
         <main className="context px-6 mt-6">
@@ -118,6 +136,12 @@ export default class App extends Component {
               path="/:key"
               element={
                 <TodoDetail getDeed={this.getDeed} />
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <Register currentUser={this.state.currentUser} />
               }
             />
           </Routes>
