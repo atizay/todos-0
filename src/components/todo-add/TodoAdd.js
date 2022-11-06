@@ -23,7 +23,6 @@ export default class TodoAdd extends Component {
 
   handleTitleChange(e) {
     this.formData.title = e.target.value;
-    console.log(e.target.value);
   }
 
   handleDescChange(e) {
@@ -55,7 +54,10 @@ export default class TodoAdd extends Component {
   }
 
   render() {
-    if (this.state.redirect) {
+    if (!this.props.currentUser) {
+      return <Navigate to="/login" replace />
+    }
+    else if (this.state.redirect) {
       return <Navigate to="/" />
     }
     else {
