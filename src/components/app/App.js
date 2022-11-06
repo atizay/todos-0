@@ -7,6 +7,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import firebaseApp from "../../firebase";
 import Register from "../register/Register";
+import Login from "../login/Login";
+import Logout from "../logout/Logout";
 
 const date1 = new Date(2022, 10,  31,  14, 5);
 const date2 = new Date(2022, 10,  31,  16, 8);
@@ -111,8 +113,18 @@ export default class App extends Component {
                 </NavLink>
               )}
               {!this.state.currentUser && (
+                <NavLink to="/login" className={ ( {isActive} ) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                  Войти
+                </NavLink>
+              )}
+              {!this.state.currentUser && (
                 <NavLink to="/register" className={ ({ isActive }) => 'navbar-item' + (isActive ? ' is-active' : '') }>
                   Зарегистрироваться
+                </NavLink>
+              )}
+              {this.state.currentUser && (
+                <NavLink to="/logout" className={ ( {isActive} ) => 'navbar-item' + (isActive ? ' is-active' : '')}>
+                  Выйти
                 </NavLink>
               )}
             </div>
@@ -142,6 +154,18 @@ export default class App extends Component {
               path="/register"
               element={
                 <Register currentUser={this.state.currentUser} />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Login currentUser={this.state.currentUser} />
+              }
+            />
+            <Route
+              path="/logout"
+              element={
+                <Logout currentUser={this.state.currentUser} />
               }
             />
           </Routes>
